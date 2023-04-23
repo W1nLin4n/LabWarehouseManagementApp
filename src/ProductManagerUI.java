@@ -194,6 +194,8 @@ public class ProductManagerUI extends JFrame {
     }
 
     public static void main(String[] args) {
+        ProductsDatabase database = ProductsDatabase.getInstance();
         SwingUtilities.invokeLater(ProductManagerUI::new);
+        database.close();
     }
 }
