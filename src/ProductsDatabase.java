@@ -312,6 +312,144 @@ public class ProductsDatabase {
     }
 
     /**
+     * Gets products from specified group
+     * @param groupName name of group
+     * @return products from specified group
+     */
+    public List<Product> getProductsFromGroup(String groupName){
+        try (PreparedStatement statement = con.prepareStatement("SELECT * FROM products WHERE product_group = ?")){
+            if(getProductGroup(groupName) == null){
+                JOptionPane.showMessageDialog(new JFrame(), "There is no product group with this name");
+                return new ArrayList<>();
+            }
+            statement.setString(1, groupName);
+            ResultSet resultSet = statement.executeQuery();
+            List<Product> list = new ArrayList<>();
+            while(resultSet.next()){
+                list.add(new Product(
+                        resultSet.getString(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getString(4),
+                        resultSet.getDouble(5),
+                        resultSet.getInt(6)
+                ));
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * Gets total value of specified product
+     * @param name name of product
+     * @return total value of specified product
+     */
+    public double getTotalValueOfProduct(String name){
+        try (PreparedStatement statement = con.prepareStatement("SELECT price*quantity AS total_value FROM products WHERE name = ?")){
+            if(getProduct(name) == null){
+                JOptionPane.showMessageDialog(new JFrame(), "There is no product with this name");
+                return 0;
+            }
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getDouble(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Gets total value of specified product group
+     * @param name name of product group
+     * @return total value of specified product group
+     */
+    public double getTotalValueOfProductGroup(String name){
+        try (PreparedStatement statement = con.prepareStatement("SELECT SUM(price*quantity) AS total_value FROM products WHERE product_group = ? GROUP BY product_group")){
+            if(getProductGroup(name) == null){
+                JOptionPane.showMessageDialog(new JFrame(), "There is no product group with this name");
+                return 0;
+            }
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+            resultSet.next();
+            return resultSet.getDouble(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Gets total value of stock
+     * @return total value of stock
+     */
+    public double getTotalValueOfStock(){
+        try {
+            Statement statement = con.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT SUM(price*quantity) AS total_value FROM products");
+            if(!resultSet.next()){
+                JOptionPane.showMessageDialog(new JFrame(), "The stock is empty");
+                return 0;
+            }
+            return resultSet.getDouble(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Changes quantity of given product
+     * @param name name of product
+     * @param change change in quantity
+     */
+    public void updateProductQuantity(String name, int change){
+        Product product = getProduct(name);
+        if(product == null){
+            JOptionPane.showMessageDialog(new JFrame(), "There is no product with this name");
+            return;
+        }
+        if(product.getQuantity() + change < 0){
+            JOptionPane.showMessageDialog(new JFrame(), "There is not enough product stock to do this");
+            return;
+        }
+        product.setQuantity(product.getQuantity() + change);
+        updateProduct(product);
+    }
+
+    /**
+     * Searches for all products that contain given request string
+     * @param request request string
+     * @return all products that contain given request string
+     */
+    public List<Product> searchProduct(String request){
+        try (PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM products WHERE name LIKE ?")){
+            preparedStatement.setString(1, "%" + request + "%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Product> list = new ArrayList<>();
+            while(resultSet.next()){
+                list.add(new Product(
+                        resultSet.getString(1),
+                        resultSet.getString(2),
+                        resultSet.getString(3),
+                        resultSet.getString(4),
+                        resultSet.getDouble(5),
+                        resultSet.getInt(6)
+                ));
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    /**
      * Closes connection to database
      */
     public void close() {
