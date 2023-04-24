@@ -423,6 +423,29 @@ public class ProductsDatabase {
     }
 
     /**
+     * Searches for all product groups that contain given request string
+     * @param request request string
+     * @return all product groups that contain given request string
+     */
+    public List<ProductGroup> searchProductGroup(String request){
+        try (PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM product_groups WHERE name LIKE ?")){
+            preparedStatement.setString(1, "%" + request + "%");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<ProductGroup> list = new ArrayList<>();
+            while(resultSet.next()){
+                list.add(new ProductGroup(
+                        resultSet.getString(1),
+                        resultSet.getString(2)
+                ));
+            }
+            return list;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
+    }
+
+    /**
      * Searches for all products that contain given request string
      * @param request request string
      * @return all products that contain given request string
