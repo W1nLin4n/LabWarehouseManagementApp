@@ -104,11 +104,11 @@ public class ProductManagerUI extends JFrame {
 
         // initialize products
         ArrayList<Product> products = new ArrayList<>();
-        products.add(new Product("Product 1", "Description for Product 1", "Manufacturer 1", 10.0, 5));
-        products.add(new Product("Product 2", "Description for Product 2", "Manufacturer 2", 20.0, 10));
-        products.add(new Product("Product 3", "Description for Product 3", "Manufacturer 1", 15.0, 3));
-        products.add(new Product("Product 4", "Description for Product 4", "Manufacturer 3", 5.0, 15));
-        products.add(new Product("Product 5", "Description for Product 5", "Manufacturer 2", 25.0, 8));
+        products.add(new Product("Product 1", "Group 1", "Description for Product 1", "Manufacturer 1", 10.0, 5));
+        products.add(new Product("Product 2", "Group 1", "Description for Product 2", "Manufacturer 2", 20.0, 10));
+        products.add(new Product("Product 3", "Group 2", "Description for Product 3", "Manufacturer 1", 15.0, 3));
+        products.add(new Product("Product 4", "Group 2", "Description for Product 4", "Manufacturer 3", 5.0, 15));
+        products.add(new Product("Product 5", "Group 3", "Description for Product 5", "Manufacturer 2", 25.0, 8));
 
         // add components to product panel
         JPanel productListPanel = new JPanel(new BorderLayout());
