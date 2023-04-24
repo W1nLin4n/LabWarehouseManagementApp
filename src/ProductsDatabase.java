@@ -192,10 +192,10 @@ public class ProductsDatabase {
             PreparedStatement preparedStatement = con.prepareStatement(
                 "UPDATE products\n" +
                     "SET\n" +
-                        "product_group = ?\n" +
-                        "description = ?\n" +
-                        "manufacturer = ?\n" +
-                        "price = ?\n" +
+                        "product_group = ?,\n" +
+                        "description = ?,\n" +
+                        "manufacturer = ?,\n" +
+                        "price = ?,\n" +
                         "quantity = ?\n" +
                     "WHERE\n" +
                         "name = ?"
@@ -228,6 +228,7 @@ public class ProductsDatabase {
                         resultSet.getString(2)
                 ));
             }
+            statement.close();
             return list;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -254,6 +255,7 @@ public class ProductsDatabase {
                         resultSet.getInt(6)
                 ));
             }
+            statement.close();
             return list;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -267,11 +269,9 @@ public class ProductsDatabase {
      * @return product group with specified name
      */
     public ProductGroup getProductGroup(String name){
-        try {
-            PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM product_groups WHERE name = ?");
+        try (PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM product_groups WHERE name = ?")){
             preparedStatement.setString(1, name);
             ResultSet resultSet = preparedStatement.executeQuery();
-            preparedStatement.close();
             if(!resultSet.next()){
                 return null;
             }
@@ -291,11 +291,9 @@ public class ProductsDatabase {
      * @return product with specified name
      */
     public Product getProduct(String name){
-        try {
-            PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM products WHERE name = ?");
+        try (PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM products WHERE name = ?")){
             preparedStatement.setString(1, name);
             ResultSet resultSet = preparedStatement.executeQuery();
-            preparedStatement.close();
             if(!resultSet.next()){
                 return null;
             }
