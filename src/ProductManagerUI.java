@@ -496,6 +496,8 @@ public class ProductManagerUI extends JFrame {
             if (selectedProduct != null) {
                 database.updateProductQuantity(selectedProduct,(Integer)productQuantitySpinner.getValue());
                 productQuantitySpinner.setValue(0);
+                String quantity = String.valueOf((database.getProduct(selectedProduct).getQuantity()));
+                productQuantityField.setText(quantity);
                 JOptionPane.showMessageDialog(null, "Product quantity successfully updated.");
             }
         });
