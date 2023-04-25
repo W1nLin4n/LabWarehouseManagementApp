@@ -1,6 +1,5 @@
 import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -25,8 +24,10 @@ public class ProductManagerUI extends JFrame {
     private JPanel statisticsPanel;
     private DefaultListModel<String> productGroupListModel;
     private DefaultListModel<String> productListModel;
+    private DefaultListModel<String> productListModel1;
     private JList<String> productGroupList;
     private JList<String> productList;
+    private JList<String> productList1;
     static int mode=1;
 
     public ProductManagerUI() {
@@ -42,8 +43,10 @@ public class ProductManagerUI extends JFrame {
         statisticsPanel = new JPanel(new BorderLayout());
         productGroupListModel = new DefaultListModel<String>();
         productListModel = new DefaultListModel<>();
+        productListModel1 = new DefaultListModel<>();
         productGroupList = new JList<>(productGroupListModel);
         productList = new JList<>(productListModel);
+        productList1 = new JList<>(productListModel1);
 
 
 
@@ -68,9 +71,16 @@ public class ProductManagerUI extends JFrame {
         productGroupButtonPanel.add(editProductGroupButton);
         productGroupButtonPanel.add(deleteProductGroupButton);
         productGroupButtonPanel.add(viewProductGroupInfoButton);
+        productGroupListModel.clear();
+        List<ProductGroup> productsGroups1 = database.searchProductGroup(searchGroupField.getText());
+        List<String> productGroups_names1 = new ArrayList<>();
+        for(ProductGroup productGroup : productsGroups1){
+            productGroups_names1.add(productGroup.getName());
+            System.out.println(getName());
+        }
+        productGroupListModel.addAll(productGroups_names1);
 
-
-        JPanel productGroupDetailsPanel = new JPanel(new GridLayout(8, 6, 5, 5));
+        JPanel productGroupDetailsPanel = new JPanel(new GridLayout(6, 6, 5, 5));
         productGroupDetailsPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Product Group Details"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -85,7 +95,9 @@ public class ProductManagerUI extends JFrame {
         productGroupDescriptionArea.setRows(30);
         productGroupDetailsPanel.add(new JScrollPane(productGroupDescriptionArea));
         productGroupDetailsPanel.add(new JLabel("Products:"));
-        productGroupDetailsPanel.add(new JPanel()); // placeholder for product list
+        JScrollPane productScrollPanel = new JScrollPane(productList1);
+        productScrollPanel.setPreferredSize(new Dimension(100,200));
+        productGroupDetailsPanel.add(productScrollPanel);
 
         JPanel productGroupDetailsButtonPanel = new JPanel();
         JButton completeAddingGroup = new JButton("Save");
@@ -122,8 +134,17 @@ public class ProductManagerUI extends JFrame {
         productButtonPanel.add(editProductButton);
         productButtonPanel.add(deleteProductButton);
         productButtonPanel.add(viewProductInfoButton);
+        productListModel.clear();
+        List<Product> products1 = database.searchProduct(searchProductField.getText());
+        List<String> product_names1 = new ArrayList<>();
+        for(Product product : products1){
+            product_names1.add(product.getName());
+            System.out.println(getName());
+        }
+        productListModel.addAll(product_names1);
 
-        JPanel productDetailsPanel = new JPanel(new GridLayout(6, 2, 6, 6));
+
+        JPanel productDetailsPanel = new JPanel(new GridLayout(7, 2, 6, 6));
         productDetailsPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Product Details"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
@@ -131,10 +152,14 @@ public class ProductManagerUI extends JFrame {
         JTextField productGroupField = new JTextField();
         JTextArea productDescriptionArea = new JTextArea();
         productDescriptionArea.setLineWrap(true);
+
         productDescriptionArea.setWrapStyleWord(true);
         JTextField productManufacturerField = new JTextField();
         JTextField productPriceField = new JTextField();
+        JTextField productQuantityField = new JTextField();
         JSpinner productQuantitySpinner = new JSpinner();
+        Dimension size = new Dimension(60, 20);
+        productQuantitySpinner.setPreferredSize(size);
         productDetailsPanel.add(new JLabel("Name:"));
         productDetailsPanel.add(productNameField);
         productDetailsPanel.add(new JLabel("Group:"));
@@ -145,7 +170,8 @@ public class ProductManagerUI extends JFrame {
         productDetailsPanel.add(productManufacturerField);
         productDetailsPanel.add(new JLabel("Price:"));
         productDetailsPanel.add(productPriceField);
-
+        productDetailsPanel.add(new JLabel("Quantity"));
+        productDetailsPanel.add(productQuantityField);
 
         JPanel productDetailsButtonPanel = new JPanel();
         JLabel empty = new JLabel();
@@ -162,20 +188,53 @@ public class ProductManagerUI extends JFrame {
         productPanel.add(productButtonPanel, BorderLayout.NORTH);
         productPanel.add(productDetailsWrapperPanel, BorderLayout.EAST);
         // initialize statistics panel
-        JPanel statisticsPanel = new JPanel(new GridLayout(3, 2, 5, 5));
+        JPanel statisticsPanel = new JPanel(new GridLayout(4, 2, 5, 5));
         statisticsPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Statistics"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         JLabel totalCostLabel = new JLabel("Total Cost of Goods in Stock:");
-        JLabel totalCostValueLabel = new JLabel("$0.00");
-        JLabel groupCostLabel = new JLabel("Total Cost of Goods in Each Group:");
+        JLabel totalCostValueLabel = new JLabel("$"+Double.toString(database.getTotalValueOfStock()));
+        JLabel groupCostLabel = new JLabel("Select group:");
         JComboBox<String> groupComboBox = new JComboBox<>();
+        JLabel productCostLabel = new JLabel("Select product:");
+        JComboBox<String> productComboBox = new JComboBox<>();
         JLabel groupCostValueLabel = new JLabel("$0.00");
         JButton calculateButton = new JButton("Calculate");
+        List<ProductGroup> productsGroups2 = database.searchProductGroup(searchGroupField.getText());
+        for(ProductGroup productGroup : productsGroups2){
+            groupComboBox.addItem(productGroup.getName());
+        }
+        groupComboBox.addActionListener(e -> {
+            if(groupComboBox.getSelectedItem()!=null) {
+                System.out.println((groupComboBox.getSelectedItem()).toString());
+                List<Product> products2 = database.getProductsFromGroup((groupComboBox.getSelectedItem()).toString());
+                productComboBox.addItem("All products");
+                for (Product product : products2) {
+                    productComboBox.addItem(product.getName());
+                }
+
+            }
+
+        });
+        calculateButton.addActionListener(e -> {
+            if(productComboBox.getSelectedItem()!=null) {
+                Double value;
+                if(productComboBox.getSelectedItem().equals("All products")){
+                    value = database.getTotalValueOfProductGroup((groupComboBox.getSelectedItem()).toString());
+                }
+                else{
+                    value=database.getTotalValueOfProduct((productComboBox.getSelectedItem()).toString());
+                }
+                groupCostValueLabel.setText("$"+value);
+            }
+        });
+
         statisticsPanel.add(totalCostLabel);
         statisticsPanel.add(totalCostValueLabel);
         statisticsPanel.add(groupCostLabel);
         statisticsPanel.add(groupComboBox);
+        statisticsPanel.add(productCostLabel);
+        statisticsPanel.add(productComboBox);
         statisticsPanel.add(groupCostValueLabel);
         statisticsPanel.add(calculateButton);
         // initialize tabbed pane
@@ -185,6 +244,11 @@ public class ProductManagerUI extends JFrame {
         tabbedPane.addTab("Statistics", statisticsPanel);
         addProductGroupButton.addActionListener(e -> {
             mode = 1;
+            productListModel1.clear();
+            productGroupNameField.setText("");
+            productGroupDescriptionArea.setText("");
+
+            completeAddingGroup.setText("Save");
             productGroupNameField.setEditable(true);
             productGroupDescriptionArea.setEditable(true);
 
@@ -192,27 +256,47 @@ public class ProductManagerUI extends JFrame {
         });
         editProductGroupButton.addActionListener(e -> {
             mode = 2;
+            completeAddingGroup.setText("Save");
             productGroupNameField.setEditable(false);
             productGroupDescriptionArea.setEditable(true);
             String selectedProductGroup = productGroupList.getSelectedValue();
             if (selectedProductGroup != null) {
                 productGroupNameField.setText(database.getProductGroup(selectedProductGroup).getName());
                 productGroupDescriptionArea.setText(database.getProductGroup(selectedProductGroup).getDescription());
+                productListModel1.clear();
+                String productGroup = database.getProductGroup(selectedProductGroup).getName();
+                List<Product> products = database.getProductsFromGroup(productGroup);
+                List<String> product_names = new ArrayList<>();
+                for(Product product : products){
+                    product_names.add(product.getName());
+                }
+                productListModel1.addAll(product_names);
             }
         });
+
         deleteProductGroupButton.addActionListener(e -> {
             mode = 3;
+            completeAddingGroup.setText("Delete");
             productGroupNameField.setEditable(false);
             productGroupDescriptionArea.setEditable(false);
             String selectedProductGroup = productGroupList.getSelectedValue();
             if (selectedProductGroup != null) {
                 productGroupNameField.setText(database.getProductGroup(selectedProductGroup).getName());
                 productGroupDescriptionArea.setText(database.getProductGroup(selectedProductGroup).getDescription());
+                productListModel1.clear();
+                String productGroup = database.getProductGroup(selectedProductGroup).getName();
+                List<Product> products = database.getProductsFromGroup(productGroup);
+                List<String> product_names = new ArrayList<>();
+                for(Product product : products){
+                    product_names.add(product.getName());
+                }
+                productListModel1.addAll(product_names);
             }
 
         });
 
         searchGroupButton.addActionListener(e -> {
+            completeAddingGroup.setText("Save");
             productGroupListModel.clear();
             List<ProductGroup> productsGroups = database.searchProductGroup(searchGroupField.getText());
             List<String> productGroups_names = new ArrayList<>();
@@ -220,7 +304,6 @@ public class ProductManagerUI extends JFrame {
                 productGroups_names.add(productGroup.getName());
                 System.out.println(getName());
             }
-            System.out.println(productGroups_names.toString());
             productGroupListModel.addAll(productGroups_names);
 
 
@@ -228,17 +311,26 @@ public class ProductManagerUI extends JFrame {
 
         });
         viewProductGroupInfoButton.addActionListener(e -> {
+            completeAddingGroup.setText("Save");
             productGroupNameField.setEditable(false);
             productGroupDescriptionArea.setEditable(false);
             String selectedProductGroup = productGroupList.getSelectedValue();
             if (selectedProductGroup != null) {
                 productGroupNameField.setText(database.getProductGroup(selectedProductGroup).getName());
                 productGroupDescriptionArea.setText(database.getProductGroup(selectedProductGroup).getDescription());
+                productListModel1.clear();
+                String productGroup = database.getProductGroup(selectedProductGroup).getName();
+                List<Product> products = database.getProductsFromGroup(productGroup);
+                List<String> product_names = new ArrayList<>();
+                for(Product product : products){
+                    product_names.add(product.getName());
+                }
+                productListModel1.addAll(product_names);
+
             }
         });
 
         completeAddingGroup.addActionListener(e -> {
-            System.out.println(mode);
             if(mode==1) {
                 String name = productGroupNameField.getText();
                 String description = productGroupDescriptionArea.getText();
@@ -265,20 +357,31 @@ public class ProductManagerUI extends JFrame {
         });
         addProductButton.addActionListener(e -> {
             mode = 4;
+            productNameField.setText("");
+            productDescriptionArea.setText("");
+            productManufacturerField.setText("");
+            productPriceField.setText("");
+            productGroupField.setText("");
+            productQuantityField.setText("");
+            productQuantitySpinner.setValue(0);
+            saveChangesButton.setText("Save");
             productNameField.setEditable(true);
             productGroupField.setEditable(true);
             productDescriptionArea.setEditable(true);
             productManufacturerField.setEditable(true);
             productPriceField.setEditable(true);
+            productQuantityField.setEditable(true);
 
         });
         editProductButton.addActionListener(e -> {
             mode = 5;
+            saveChangesButton.setText("Save");
             productNameField.setEditable(false);
             productGroupField.setEditable(true);
             productDescriptionArea.setEditable(true);
             productManufacturerField.setEditable(true);
             productPriceField.setEditable(true);
+            productQuantityField.setEditable(true);
             String selectedProduct = productList.getSelectedValue();
             if (selectedProduct != null) {
                 productNameField.setText(database.getProduct(selectedProduct).getName());
@@ -286,17 +389,19 @@ public class ProductManagerUI extends JFrame {
                 productGroupField.setText(database.getProduct(selectedProduct).getGroup());
                 productManufacturerField.setText(database.getProduct(selectedProduct).getManufacturer());
                 productPriceField.setText(String.valueOf(database.getProduct(selectedProduct).getPrice()));
-                productQuantitySpinner.setValue((database.getProduct(selectedProduct).getQuantity()));
+                productQuantityField.setText(String.valueOf((database.getProduct(selectedProduct).getQuantity())));
             }
 
         });
         deleteProductButton.addActionListener(e -> {
                     mode = 6;
+                    saveChangesButton.setText("Delete");
                     productNameField.setEditable(false);
                     productGroupField.setEditable(false);
                     productDescriptionArea.setEditable(false);
                     productManufacturerField.setEditable(false);
                     productPriceField.setEditable(false);
+                    productQuantityField.setEditable(false);
                     String selectedProduct = productList.getSelectedValue();
                     if (selectedProduct != null) {
                         productNameField.setText(database.getProduct(selectedProduct).getName());
@@ -304,7 +409,7 @@ public class ProductManagerUI extends JFrame {
                         productGroupField.setText(database.getProduct(selectedProduct).getGroup());
                         productManufacturerField.setText(database.getProduct(selectedProduct).getManufacturer());
                         productPriceField.setText(String.valueOf(database.getProduct(selectedProduct).getPrice()));
-                        productQuantitySpinner.setValue((database.getProduct(selectedProduct).getQuantity()));
+                        productQuantityField.setText(String.valueOf((database.getProduct(selectedProduct).getQuantity())));
                     }
                 });
         saveChangesButton.addActionListener(e -> {
@@ -315,7 +420,8 @@ public class ProductManagerUI extends JFrame {
                 String manufacturer = productManufacturerField.getText();
                 Double price = Double.valueOf(productPriceField.getText());
                 String group = productGroupField.getText();
-                Product product = new Product(name,group, description,manufacturer,price,0);
+                Integer quantity =   Integer.valueOf(productQuantityField.getText());
+                Product product = new Product(name,group, description,manufacturer,price,quantity);
                 database.addProduct(product);
                 productListModel.addElement(name);
                 JOptionPane.showMessageDialog(null, "Product successfully added.");
@@ -327,7 +433,7 @@ public class ProductManagerUI extends JFrame {
                 String manufacturer = productManufacturerField.getText();
                 Double price = Double.valueOf(productPriceField.getText());
                 String group = productGroupField.getText();
-                int quantity = (int) productQuantitySpinner.getValue();
+                Integer quantity =   Integer.valueOf(productQuantityField.getText());
                 Product product = new Product(name,group,description,manufacturer,price,quantity);
                 database.updateProduct(product);
                 JOptionPane.showMessageDialog(null, "Product successfully edited.");
@@ -343,14 +449,17 @@ public class ProductManagerUI extends JFrame {
             productManufacturerField.setText("");
             productPriceField.setText("");
             productGroupField.setText("");
+            productQuantityField.setText("");
             productQuantitySpinner.setValue(0);
         });
         viewProductInfoButton.addActionListener(e -> {
+            saveChangesButton.setText("Save");
                     productNameField.setEditable(false);
                     productGroupField.setEditable(false);
                     productDescriptionArea.setEditable(false);
                     productManufacturerField.setEditable(false);
                     productPriceField.setEditable(false);
+                    productQuantityField.setEditable(false);
                     String selectedProduct = productList.getSelectedValue();
                     if (selectedProduct != null) {
                         productNameField.setText(database.getProduct(selectedProduct).getName());
@@ -358,18 +467,17 @@ public class ProductManagerUI extends JFrame {
                         productGroupField.setText(database.getProduct(selectedProduct).getGroup());
                         productManufacturerField.setText(database.getProduct(selectedProduct).getManufacturer());
                         productPriceField.setText(String.valueOf(database.getProduct(selectedProduct).getPrice()));
-                        productQuantitySpinner.setValue((database.getProduct(selectedProduct).getQuantity()));
+                        productQuantityField.setText(String.valueOf((database.getProduct(selectedProduct).getQuantity())));
                     }
         });
         searchProductButton.addActionListener(e -> {
+            saveChangesButton.setText("Save");
             productListModel.clear();
             List<Product> products = database.searchProduct(searchProductField.getText());
             List<String> product_names = new ArrayList<>();
             for(Product product : products){
                 product_names.add(product.getName());
-                System.out.println(getName());
             }
-            System.out.println(product_names.toString());
             productListModel.addAll(product_names);
 
 
@@ -377,12 +485,20 @@ public class ProductManagerUI extends JFrame {
 
         });
 
+
         productDetailsButtonPanel.add(new JLabel("Quantity:"));
         JButton changeQuantity = new JButton("Change");
         productDetailsButtonPanel.add(productQuantitySpinner);
         productDetailsButtonPanel.add(changeQuantity);
 
-
+        changeQuantity.addActionListener(e -> {
+            String selectedProduct = productList.getSelectedValue();
+            if (selectedProduct != null) {
+                database.updateProductQuantity(selectedProduct,(Integer)productQuantitySpinner.getValue());
+                productQuantitySpinner.setValue(0);
+                JOptionPane.showMessageDialog(null, "Product quantity successfully updated.");
+            }
+        });
 
         // initialize main frame
         JFrame frame = new JFrame("Product Management System");
