@@ -459,15 +459,26 @@ public class ProductManagerUI extends JFrame {
                     String name = productNameField.getText();
                     String description = productDescriptionArea.getText();
                     String manufacturer = productManufacturerField.getText();
-                    Double price = Double.valueOf(productPriceField.getText());
+                    String quantityText = (productQuantityField.getText());
+                    String priceText = (productPriceField.getText());
                     String group = productGroupField.getText();
-                    Integer quantity = Integer.valueOf(productQuantityField.getText());
-                    Product product = new Product(name, group, description, manufacturer, price, quantity);
-                    database.updateProduct(product);
-                    JOptionPane.showMessageDialog(null, "Product successfully edited.");
+                    try {
+                        int quantity = Integer.parseInt(quantityText);
+                        double price = Double.parseDouble(priceText);
+                        Product product = new Product(name, group, description, manufacturer, price, quantity);
+                        database.updateProduct(product);
+                        JOptionPane.showMessageDialog(null, "Product successfully edited.");
+                    } catch (NumberFormatException s) {
+                        JOptionPane.showMessageDialog(null, "Use only numbers.");
+                        productPriceField.setText("");
+                        productQuantityField.setText("");
+                        return;
+                    }
                 }
                 else{
-                    JOptionPane.showMessageDialog(null, "Group does not exist..");
+                    JOptionPane.showMessageDialog(null, "Group does not exist.");
+                    productGroupField.setText("");
+                    return;
                 }
 
             }
