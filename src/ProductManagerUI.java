@@ -328,12 +328,17 @@ public class ProductManagerUI extends JFrame {
 
         completeAddingGroup.addActionListener(e -> {
             if(mode==1) {
-                String name = productGroupNameField.getText();
-                String description = productGroupDescriptionArea.getText();
-                ProductGroup productGroup = new ProductGroup(name, description);
-                database.addProductGroup(productGroup);
-                productGroupListModel.addElement(name);
-                JOptionPane.showMessageDialog(null, "Group successfully added.");
+                if(database.getProductGroup(productGroupNameField.getText())==null) {
+                    String name = productGroupNameField.getText();
+                    String description = productGroupDescriptionArea.getText();
+                    ProductGroup productGroup = new ProductGroup(name, description);
+                    database.addProductGroup(productGroup);
+                    productGroupListModel.addElement(name);
+                    JOptionPane.showMessageDialog(null, "Group successfully added.");
+                }
+                else{
+                    JOptionPane.showMessageDialog(null, "Group already exists.");
+                }
 
             }
             else if(mode==2){
@@ -410,28 +415,51 @@ public class ProductManagerUI extends JFrame {
                 });
         saveChangesButton.addActionListener(e -> {
             if(mode==4) {
-                String name = productNameField.getText();
-                String description = productDescriptionArea.getText();
-                String manufacturer = productManufacturerField.getText();
-                Double price = Double.valueOf(productPriceField.getText());
-                String group = productGroupField.getText();
-                Integer quantity =   Integer.valueOf(productQuantityField.getText());
-                Product product = new Product(name,group, description,manufacturer,price,quantity);
-                database.addProduct(product);
-                productListModel.addElement(name);
-                JOptionPane.showMessageDialog(null, "Product successfully added.");
+                if(database.getProduct(productNameField.getText())==null&&database.getProductGroup(productGroupField.getText())!=null) {
 
+                    String name = productNameField.getText();
+                    String description = productDescriptionArea.getText();
+                    String manufacturer = productManufacturerField.getText();
+                    String group = productGroupField.getText();
+                    String quantityText = (productQuantityField.getText());
+                    String priceText = (productPriceField.getText());
+                    try {
+                        int quantity = Integer.parseInt(quantityText);
+                        double price = Double.parseDouble(priceText);
+                        Product product = new Product(name, group, description, manufacturer, price, quantity);
+                        database.addProduct(product);
+                        productListModel.addElement(name);
+                        JOptionPane.showMessageDialog(null, "Product successfully added.");
+                    } catch (NumberFormatException s) {
+                        JOptionPane.showMessageDialog(null, "Use only numbers.");
+                        productPriceField.setText("");
+                        productQuantityField.setText("");
+                        return;
+                    }
+                }
+                else if(database.getProduct(productNameField.getText())!=null){
+                    JOptionPane.showMessageDialog(null, "Product already exists.");
+                }
+                else if(database.getProductGroup(productGroupField.getText())!=null){
+                    JOptionPane.showMessageDialog(null, "Group does not exist.");
+
+                }
             }
             else if(mode==5){
-                String name = productNameField.getText();
-                String description = productDescriptionArea.getText();
-                String manufacturer = productManufacturerField.getText();
-                Double price = Double.valueOf(productPriceField.getText());
-                String group = productGroupField.getText();
-                Integer quantity =   Integer.valueOf(productQuantityField.getText());
-                Product product = new Product(name,group,description,manufacturer,price,quantity);
-                database.updateProduct(product);
-                JOptionPane.showMessageDialog(null, "Product successfully edited.");
+                if (database.getProductGroup(productGroupField.getText()) != null) {
+                    String name = productNameField.getText();
+                    String description = productDescriptionArea.getText();
+                    String manufacturer = productManufacturerField.getText();
+                    Double price = Double.valueOf(productPriceField.getText());
+                    String group = productGroupField.getText();
+                    Integer quantity = Integer.valueOf(productQuantityField.getText());
+                    Product product = new Product(name, group, description, manufacturer, price, quantity);
+                    database.updateProduct(product);
+                    JOptionPane.showMessageDialog(null, "Product successfully edited.");
+                }
+                else{
+                    JOptionPane.showMessageDialog(null, "Group does not exist..");
+                }
 
             }
             else if(mode==6){
