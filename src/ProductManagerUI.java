@@ -13,8 +13,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.plaf.basic.BasicInternalFrameTitlePane;
 
 
 public class ProductManagerUI extends JFrame {
@@ -76,7 +75,6 @@ public class ProductManagerUI extends JFrame {
         List<String> productGroups_names1 = new ArrayList<>();
         for(ProductGroup productGroup : productsGroups1){
             productGroups_names1.add(productGroup.getName());
-            System.out.println(getName());
         }
         productGroupListModel.addAll(productGroups_names1);
 
@@ -139,7 +137,6 @@ public class ProductManagerUI extends JFrame {
         List<String> product_names1 = new ArrayList<>();
         for(Product product : products1){
             product_names1.add(product.getName());
-            System.out.println(getName());
         }
         productListModel.addAll(product_names1);
 
@@ -206,7 +203,7 @@ public class ProductManagerUI extends JFrame {
         }
         groupComboBox.addActionListener(e -> {
             if(groupComboBox.getSelectedItem()!=null) {
-                System.out.println((groupComboBox.getSelectedItem()).toString());
+                productComboBox.removeAllItems();
                 List<Product> products2 = database.getProductsFromGroup((groupComboBox.getSelectedItem()).toString());
                 productComboBox.addItem("All products");
                 for (Product product : products2) {
@@ -302,7 +299,6 @@ public class ProductManagerUI extends JFrame {
             List<String> productGroups_names = new ArrayList<>();
             for(ProductGroup productGroup : productsGroups){
                 productGroups_names.add(productGroup.getName());
-                System.out.println(getName());
             }
             productGroupListModel.addAll(productGroups_names);
 
@@ -413,7 +409,6 @@ public class ProductManagerUI extends JFrame {
                     }
                 });
         saveChangesButton.addActionListener(e -> {
-            System.out.println(mode);
             if(mode==4) {
                 String name = productNameField.getText();
                 String description = productDescriptionArea.getText();
