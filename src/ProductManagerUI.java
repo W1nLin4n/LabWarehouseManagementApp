@@ -114,6 +114,7 @@ public class ProductManagerUI extends JFrame {
 
         JPanel productListPanel = new JPanel(new BorderLayout());
         productListPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+
         productListPanel.add(new JLabel("Products"), BorderLayout.NORTH);
         JScrollPane productScrollPane = new JScrollPane(productList);
         productListPanel.add(productScrollPane, BorderLayout.CENTER);
@@ -141,22 +142,27 @@ public class ProductManagerUI extends JFrame {
         productListModel.addAll(product_names1);
 
 
-        JPanel productDetailsPanel = new JPanel(new GridLayout(7, 2, 6, 6));
+        JPanel productDetailsPanel = new JPanel(new GridLayout(7, 4, 5, 5));
         productDetailsPanel.setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createTitledBorder("Product Details"),
                 BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        Dimension list = new Dimension(500,500);
+        productDetailsPanel.setPreferredSize(list);
         JTextField productNameField = new JTextField();
+        productNameField.setColumns(3);
         JTextField productGroupField = new JTextField();
+        productGroupField.setColumns(3);
         JTextArea productDescriptionArea = new JTextArea();
+        productDescriptionArea.setColumns(3);
         productDescriptionArea.setLineWrap(true);
-
         productDescriptionArea.setWrapStyleWord(true);
         JTextField productManufacturerField = new JTextField();
+        productManufacturerField.setColumns(3);
         JTextField productPriceField = new JTextField();
+        productPriceField.setColumns(3);
         JTextField productQuantityField = new JTextField();
+        productQuantityField.setColumns(3);
         JSpinner productQuantitySpinner = new JSpinner();
-        Dimension size = new Dimension(60, 20);
-        productQuantitySpinner.setPreferredSize(size);
         productDetailsPanel.add(new JLabel("Name:"));
         productDetailsPanel.add(productNameField);
         productDetailsPanel.add(new JLabel("Group:"));
