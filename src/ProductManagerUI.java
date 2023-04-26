@@ -437,12 +437,21 @@ public class ProductManagerUI extends JFrame {
                         return;
                     }
                 }
+                else if(database.getProduct(productNameField.getText())!=null&&database.getProductGroup(productGroupField.getText())==null){
+                    JOptionPane.showMessageDialog(null, "Enter correct product and group.");
+                    productNameField.setText("");
+                    productGroupField.setText("");
+                    return;
+                }
                 else if(database.getProduct(productNameField.getText())!=null){
                     JOptionPane.showMessageDialog(null, "Product already exists.");
+                    productNameField.setText("");
+                    return;
                 }
-                else if(database.getProductGroup(productGroupField.getText())!=null){
+                else if(database.getProductGroup(productGroupField.getText())==null){
                     JOptionPane.showMessageDialog(null, "Group does not exist.");
-
+                    productGroupField.setText("");
+                    return;
                 }
             }
             else if(mode==5){
