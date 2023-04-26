@@ -251,7 +251,8 @@ public class ProductManagerUI extends JFrame {
             productGroupNameField.setText("");
             productGroupDescriptionArea.setText("");
 
-            completeAddingGroup.setText("Save");
+            completeAddingGroup.setText("Add");
+            completeAddingGroup.setEnabled(true);
             productGroupNameField.setEditable(true);
             productGroupDescriptionArea.setEditable(true);
 
@@ -260,6 +261,7 @@ public class ProductManagerUI extends JFrame {
         editProductGroupButton.addActionListener(e -> {
             mode = 2;
             completeAddingGroup.setText("Save");
+            completeAddingGroup.setEnabled(true);
             productGroupNameField.setEditable(false);
             productGroupDescriptionArea.setEditable(true);
             String selectedProductGroup = productGroupList.getSelectedValue();
@@ -280,6 +282,7 @@ public class ProductManagerUI extends JFrame {
         deleteProductGroupButton.addActionListener(e -> {
             mode = 3;
             completeAddingGroup.setText("Delete");
+            completeAddingGroup.setEnabled(true);
             productGroupNameField.setEditable(false);
             productGroupDescriptionArea.setEditable(false);
             String selectedProductGroup = productGroupList.getSelectedValue();
@@ -299,7 +302,7 @@ public class ProductManagerUI extends JFrame {
         });
 
         searchGroupButton.addActionListener(e -> {
-            completeAddingGroup.setText("Save");
+            completeAddingGroup.setEnabled(false);
             productGroupListModel.clear();
             List<ProductGroup> productsGroups = database.searchProductGroup(searchGroupField.getText());
             List<String> productGroups_names = new ArrayList<>();
@@ -313,7 +316,7 @@ public class ProductManagerUI extends JFrame {
 
         });
         viewProductGroupInfoButton.addActionListener(e -> {
-            completeAddingGroup.setText("Save");
+            completeAddingGroup.setEnabled(false);
             productGroupNameField.setEditable(false);
             productGroupDescriptionArea.setEditable(false);
             String selectedProductGroup = productGroupList.getSelectedValue();
@@ -371,7 +374,8 @@ public class ProductManagerUI extends JFrame {
             productGroupField.setText("");
             productQuantityField.setText("");
             productQuantitySpinner.setValue(0);
-            saveChangesButton.setText("Save");
+            saveChangesButton.setText("Add");
+            saveChangesButton.setEnabled(true);
             productNameField.setEditable(true);
             productGroupField.setEditable(true);
             productDescriptionArea.setEditable(true);
@@ -383,6 +387,7 @@ public class ProductManagerUI extends JFrame {
         editProductButton.addActionListener(e -> {
             mode = 5;
             saveChangesButton.setText("Save");
+            saveChangesButton.setEnabled(true);
             productNameField.setEditable(false);
             productGroupField.setEditable(true);
             productDescriptionArea.setEditable(true);
@@ -403,6 +408,7 @@ public class ProductManagerUI extends JFrame {
         deleteProductButton.addActionListener(e -> {
                     mode = 6;
                     saveChangesButton.setText("Delete");
+                    saveChangesButton.setEnabled(true);
                     productNameField.setEditable(false);
                     productGroupField.setEditable(false);
                     productDescriptionArea.setEditable(false);
@@ -502,7 +508,7 @@ public class ProductManagerUI extends JFrame {
             productQuantitySpinner.setValue(0);
         });
         viewProductInfoButton.addActionListener(e -> {
-            saveChangesButton.setText("Save");
+                    saveChangesButton.setEnabled(false);
                     productNameField.setEditable(false);
                     productGroupField.setEditable(false);
                     productDescriptionArea.setEditable(false);
@@ -520,7 +526,7 @@ public class ProductManagerUI extends JFrame {
                     }
         });
         searchProductButton.addActionListener(e -> {
-            saveChangesButton.setText("Save");
+            saveChangesButton.setEnabled(false);
             productListModel.clear();
             List<Product> products = database.searchProduct(searchProductField.getText());
             List<String> product_names = new ArrayList<>();
