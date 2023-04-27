@@ -46,10 +46,6 @@ public class ProductManagerUI extends JFrame {
         productGroupList = new JList<>(productGroupListModel);
         productList = new JList<>(productListModel);
         productList1 = new JList<>(productListModel1);
-
-
-
-        // add components to product group panel
         JPanel productGroupListPanel = new JPanel(new BorderLayout());
         productGroupListPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         productGroupListPanel.add(new JLabel("Product Groups"), BorderLayout.NORTH);
@@ -381,7 +377,6 @@ public class ProductManagerUI extends JFrame {
             productManufacturerField.setText("");
             productPriceField.setText("");
             productQuantityField.setText("");
-            groupComboBoxField.setSelectedItem("");
             productQuantitySpinner.setValue(0);
             saveChangesButton.setText("Add");
             saveChangesButton.setEnabled(true);
@@ -440,7 +435,8 @@ public class ProductManagerUI extends JFrame {
                     String name = productNameField.getText();
                     String description = productDescriptionArea.getText();
                     String manufacturer = productManufacturerField.getText();
-                    String group = groupComboBox.getSelectedItem().toString();;
+                    String group = ((groupComboBoxField.getSelectedItem()).toString());
+                    System.out.println(group);
                     String quantityText = (productQuantityField.getText());
                     String priceText = (productPriceField.getText());
                     try {
@@ -471,7 +467,7 @@ public class ProductManagerUI extends JFrame {
                     String manufacturer = productManufacturerField.getText();
                     String quantityText = (productQuantityField.getText());
                     String priceText = (productPriceField.getText());
-                    String group = groupComboBox.getSelectedItem().toString();;
+                    String group = groupComboBoxField.getSelectedItem().toString();;
                     try {
                         int quantity = Integer.parseInt(quantityText);
                         double price = Double.parseDouble(priceText);
@@ -495,9 +491,17 @@ public class ProductManagerUI extends JFrame {
             productDescriptionArea.setText("");
             productManufacturerField.setText("");
             productPriceField.setText("");
-            groupComboBoxField.setSelectedItem("");
             productQuantityField.setText("");
             productQuantitySpinner.setValue(0);
+            if(groupComboBox.getSelectedItem()!=null) {
+                productComboBox.removeAllItems();
+                List<Product> products2 = database.getProductsFromGroup((groupComboBox.getSelectedItem()).toString());
+                productComboBox.addItem("All products");
+                for (Product product : products2) {
+                    productComboBox.addItem(product.getName());
+                }
+
+            }
         });
         viewProductInfoButton.addActionListener(e -> {
                     saveChangesButton.setEnabled(false);
