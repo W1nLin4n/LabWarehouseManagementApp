@@ -150,8 +150,11 @@ public class ProductManagerUI extends JFrame {
         productDetailsPanel.setPreferredSize(list);
         JTextField productNameField = new JTextField();
         productNameField.setColumns(3);
-        JTextField productGroupField = new JTextField();
-        productGroupField.setColumns(3);
+        JComboBox<String> groupComboBoxField = new JComboBox<>();
+        List<ProductGroup> productsGroups3 = database.searchProductGroup("");
+        for(ProductGroup productGroup : productsGroups3){
+            groupComboBoxField.addItem(productGroup.getName());
+        };
         JTextArea productDescriptionArea = new JTextArea();
         productDescriptionArea.setColumns(3);
         productDescriptionArea.setLineWrap(true);
@@ -166,7 +169,7 @@ public class ProductManagerUI extends JFrame {
         productDetailsPanel.add(new JLabel("Name:"));
         productDetailsPanel.add(productNameField);
         productDetailsPanel.add(new JLabel("Group:"));
-        productDetailsPanel.add(productGroupField);
+        productDetailsPanel.add(groupComboBoxField);
         productDetailsPanel.add(new JLabel("Description:"));
         productDetailsPanel.add(new JScrollPane(productDescriptionArea));
         productDetailsPanel.add(new JLabel("Manufacturer:"));
@@ -181,7 +184,6 @@ public class ProductManagerUI extends JFrame {
         JButton saveChangesButton = new JButton("Save");
         productDetailsPanel.add(empty);
         productDetailsPanel.add(saveChangesButton);
-
         JPanel productDetailsWrapperPanel = new JPanel(new BorderLayout());
         productDetailsWrapperPanel.setBorder(BorderFactory.createEmptyBorder(5, 0, 5, 5));
         productDetailsWrapperPanel.add(productDetailsPanel, BorderLayout.CENTER);
@@ -362,6 +364,13 @@ public class ProductManagerUI extends JFrame {
                 productGroupListModel.removeElement(productGroupNameField.getText());
                 JOptionPane.showMessageDialog(null, "Group successfully deleted.");
             }
+            groupComboBoxField.removeAllItems();
+            groupComboBox.removeAllItems();
+            List<ProductGroup> productsGroups4 = database.searchProductGroup("");
+            for(ProductGroup productGroup : productsGroups4){
+                groupComboBox.addItem(productGroup.getName());
+                groupComboBoxField.addItem(productGroup.getName());
+            };
             productGroupNameField.setText("");
             productGroupDescriptionArea.setText("");
         });
@@ -371,13 +380,13 @@ public class ProductManagerUI extends JFrame {
             productDescriptionArea.setText("");
             productManufacturerField.setText("");
             productPriceField.setText("");
-            productGroupField.setText("");
             productQuantityField.setText("");
+            groupComboBoxField.setSelectedItem("");
             productQuantitySpinner.setValue(0);
             saveChangesButton.setText("Add");
             saveChangesButton.setEnabled(true);
             productNameField.setEditable(true);
-            productGroupField.setEditable(true);
+            groupComboBoxField.setEnabled(true);
             productDescriptionArea.setEditable(true);
             productManufacturerField.setEditable(true);
             productPriceField.setEditable(true);
@@ -389,7 +398,7 @@ public class ProductManagerUI extends JFrame {
             saveChangesButton.setText("Save");
             saveChangesButton.setEnabled(true);
             productNameField.setEditable(false);
-            productGroupField.setEditable(true);
+            groupComboBoxField.setEnabled(true);
             productDescriptionArea.setEditable(true);
             productManufacturerField.setEditable(true);
             productPriceField.setEditable(true);
@@ -398,19 +407,18 @@ public class ProductManagerUI extends JFrame {
             if (selectedProduct != null) {
                 productNameField.setText(database.getProduct(selectedProduct).getName());
                 productDescriptionArea.setText(database.getProduct(selectedProduct).getDescription());
-                productGroupField.setText(database.getProduct(selectedProduct).getGroup());
+                groupComboBoxField.setSelectedItem(database.getProduct(selectedProduct).getGroup());
                 productManufacturerField.setText(database.getProduct(selectedProduct).getManufacturer());
                 productPriceField.setText(String.valueOf(database.getProduct(selectedProduct).getPrice()));
                 productQuantityField.setText(String.valueOf((database.getProduct(selectedProduct).getQuantity())));
             }
-
         });
         deleteProductButton.addActionListener(e -> {
                     mode = 6;
                     saveChangesButton.setText("Delete");
                     saveChangesButton.setEnabled(true);
                     productNameField.setEditable(false);
-                    productGroupField.setEditable(false);
+                    groupComboBoxField.setEnabled(false);
                     productDescriptionArea.setEditable(false);
                     productManufacturerField.setEditable(false);
                     productPriceField.setEditable(false);
@@ -419,7 +427,7 @@ public class ProductManagerUI extends JFrame {
                     if (selectedProduct != null) {
                         productNameField.setText(database.getProduct(selectedProduct).getName());
                         productDescriptionArea.setText(database.getProduct(selectedProduct).getDescription());
-                        productGroupField.setText(database.getProduct(selectedProduct).getGroup());
+                        groupComboBoxField.setSelectedItem(database.getProduct(selectedProduct).getGroup());
                         productManufacturerField.setText(database.getProduct(selectedProduct).getManufacturer());
                         productPriceField.setText(String.valueOf(database.getProduct(selectedProduct).getPrice()));
                         productQuantityField.setText(String.valueOf((database.getProduct(selectedProduct).getQuantity())));
@@ -427,12 +435,12 @@ public class ProductManagerUI extends JFrame {
                 });
         saveChangesButton.addActionListener(e -> {
             if(mode==4) {
-                if(database.getProduct(productNameField.getText())==null&&database.getProductGroup(productGroupField.getText())!=null) {
+                if(database.getProduct(productNameField.getText())==null) {
 
                     String name = productNameField.getText();
                     String description = productDescriptionArea.getText();
                     String manufacturer = productManufacturerField.getText();
-                    String group = productGroupField.getText();
+                    String group = groupComboBox.getSelectedItem().toString();;
                     String quantityText = (productQuantityField.getText());
                     String priceText = (productPriceField.getText());
                     try {
@@ -449,31 +457,21 @@ public class ProductManagerUI extends JFrame {
                         return;
                     }
                 }
-                else if(database.getProduct(productNameField.getText())!=null&&database.getProductGroup(productGroupField.getText())==null){
-                    JOptionPane.showMessageDialog(null, "Enter correct product and group.");
-                    productNameField.setText("");
-                    productGroupField.setText("");
-                    return;
-                }
+
                 else if(database.getProduct(productNameField.getText())!=null){
                     JOptionPane.showMessageDialog(null, "Product already exists.");
                     productNameField.setText("");
                     return;
                 }
-                else if(database.getProductGroup(productGroupField.getText())==null){
-                    JOptionPane.showMessageDialog(null, "Group does not exist.");
-                    productGroupField.setText("");
-                    return;
-                }
+
             }
             else if(mode==5){
-                if (database.getProductGroup(productGroupField.getText()) != null) {
                     String name = productNameField.getText();
                     String description = productDescriptionArea.getText();
                     String manufacturer = productManufacturerField.getText();
                     String quantityText = (productQuantityField.getText());
                     String priceText = (productPriceField.getText());
-                    String group = productGroupField.getText();
+                    String group = groupComboBox.getSelectedItem().toString();;
                     try {
                         int quantity = Integer.parseInt(quantityText);
                         double price = Double.parseDouble(priceText);
@@ -486,12 +484,6 @@ public class ProductManagerUI extends JFrame {
                         productQuantityField.setText("");
                         return;
                     }
-                }
-                else{
-                    JOptionPane.showMessageDialog(null, "Group does not exist.");
-                    productGroupField.setText("");
-                    return;
-                }
 
             }
             else if(mode==6){
@@ -503,14 +495,14 @@ public class ProductManagerUI extends JFrame {
             productDescriptionArea.setText("");
             productManufacturerField.setText("");
             productPriceField.setText("");
-            productGroupField.setText("");
+            groupComboBoxField.setSelectedItem("");
             productQuantityField.setText("");
             productQuantitySpinner.setValue(0);
         });
         viewProductInfoButton.addActionListener(e -> {
                     saveChangesButton.setEnabled(false);
                     productNameField.setEditable(false);
-                    productGroupField.setEditable(false);
+                    groupComboBoxField.setEnabled(false);
                     productDescriptionArea.setEditable(false);
                     productManufacturerField.setEditable(false);
                     productPriceField.setEditable(false);
@@ -519,7 +511,7 @@ public class ProductManagerUI extends JFrame {
                     if (selectedProduct != null) {
                         productNameField.setText(database.getProduct(selectedProduct).getName());
                         productDescriptionArea.setText(database.getProduct(selectedProduct).getDescription());
-                        productGroupField.setText(database.getProduct(selectedProduct).getGroup());
+                        groupComboBoxField.setSelectedItem(database.getProduct(selectedProduct).getGroup());
                         productManufacturerField.setText(database.getProduct(selectedProduct).getManufacturer());
                         productPriceField.setText(String.valueOf(database.getProduct(selectedProduct).getPrice()));
                         productQuantityField.setText(String.valueOf((database.getProduct(selectedProduct).getQuantity())));
@@ -543,6 +535,8 @@ public class ProductManagerUI extends JFrame {
 
         productDetailsButtonPanel.add(new JLabel("Quantity:"));
         JButton changeQuantity = new JButton("Change");
+        Dimension size=new Dimension(80,15);
+        productQuantitySpinner.setPreferredSize(size);
         productDetailsButtonPanel.add(productQuantitySpinner);
         productDetailsButtonPanel.add(changeQuantity);
 
