@@ -376,7 +376,10 @@ public class ProductsDatabase {
             }
             statement.setString(1, name);
             ResultSet resultSet = statement.executeQuery();
-            resultSet.next();
+            if(!resultSet.next()){
+                JOptionPane.showMessageDialog(new JFrame(), "The group is empty");
+                return 0;
+            }
             return resultSet.getDouble(1);
         } catch (SQLException e) {
             e.printStackTrace();
